@@ -1,5 +1,6 @@
 import os
 import warnings
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,43 +8,51 @@ from torch.utils.data import Dataset
 from utils.timefeatures import time_features
 from utils.tools import StandardScaler
 
-# from sklearn.preprocessing import StandardScaler
-
-
 warnings.filterwarnings("ignore")
 
 
-class Dataset_Custom(Dataset):
+class Dataset_TSFHD(Dataset):
     def __init__(
         self,
-        root_path,
-        flag="train",
-        size=None,
-        features="S",
-        data_path="ETTh1.csv",
-        target="OT",
-        scale=True,
-        inverse=False,
-        timeenc=0,
-        freq="h",
-        cols=None,
-    ):
-        # size [seq_len, label_len, pred_len]
-        # info
-        if size is None:
-            self.seq_len = 24 * 4 * 4
-            self.label_len = 24 * 4
-            self.pred_len = 24 * 4
-        else:
-            self.seq_len = size[0]
-            self.label_len = size[1]
-            self.pred_len = size[2]
-        # init
-        # trunk-ignore(bandit/B101)
-        assert flag in ["train", "test", "val"]
-        type_map = {"train": 0, "val": 1, "test": 2}
-        self.set_type = type_map[flag]
+        root_path: str,
+        flag: str = "train",
+        size: Optional[List[int]] = None,
+        features: str = "S",
+        data_path: str = "ETTh1.csv",
+        target: str = "OT",
+        scale: bool = True,
+        inverse: bool = False,
+        timeenc: int = 0,
+        freq: str = "h",
+        cols: Optional[List[str]] = None,
+    ) -> None:
+        """
+        Dataset for Time Series Forecasting with Historical Data.
 
+        Args:
+            root_path (str): Root path for the dataset.
+            flag (str): Flag indicating the dataset split ("train", "test", "val").
+            size (List[int], optional): Size of sequence, label, and prediction length.
+            features (str): Type of features ("S", "M", or "MS").
+            data_path (str): Path to the dataset file.
+            target (str): Target feature name.
+            scale (bool): Whether to scale the data.
+            inverse (bool): Whether to inverse transform the data.
+            timeenc (int): Type of time encoding.
+            freq (str): Frequency of the time series data.
+            cols (List[str], optional): List of column names.
+        """
+        # Initialize default values for sequence length, label length, and prediction length
+        self.seq_len = 24 * 4 * 4
+        self.label_len = 24 * 4
+        self.pred_len = 24 * 4
+
+        # Update values if provided
+        if size is not None:
+            self.seq_len, self.label_len, self.pred_len = size
+
+        # Initialize class attributes
+        self.set_type = {"train": 0, "val": 1, "test": 2}[flag]
         self.features = features
         self.target = target
         self.scale = scale
@@ -55,13 +64,14 @@ class Dataset_Custom(Dataset):
         self.data_path = data_path
         self.__read_data__()
 
-    def __read_data__(self):
+    def __read_data__(self) -> None:
+        """
+        Read and preprocess the dataset.
+        """
         self.scaler = StandardScaler()
         df_raw = pd.read_csv(os.path.join(self.root_path, self.data_path))
-        """
-        df_raw.columns: ['date', ...(other features), target feature]
-        """
-        # cols = list(df_raw.columns);
+
+        # Select relevant columns
         if self.cols:
             cols = self.cols.copy()
             cols.remove(self.target)
@@ -71,6 +81,7 @@ class Dataset_Custom(Dataset):
             cols.remove("date")
         df_raw = df_raw[["date"] + cols + [self.target]]
 
+        # Split dataset based on flag
         num_train = int(len(df_raw) * 0.7)
         num_test = int(len(df_raw) * 0.2)
         num_vali = len(df_raw) - num_train - num_test
@@ -79,12 +90,14 @@ class Dataset_Custom(Dataset):
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
+        # Select features based on feature type
         if self.features == "M" or self.features == "MS":
             cols_data = df_raw.columns[1:]
             df_data = df_raw[cols_data]
         elif self.features == "S":
             df_data = df_raw[[self.target]]
 
+        # Scale the data if needed
         if self.scale:
             train_data = df_data[border1s[0] : border2s[0]]
             self.scaler.fit(train_data.values)
@@ -92,10 +105,12 @@ class Dataset_Custom(Dataset):
         else:
             data = df_data.values
 
+        # Extract timestamp features
         df_stamp = df_raw[["date"]][border1:border2]
         df_stamp["date"] = pd.to_datetime(df_stamp.date)
         data_stamp = time_features(df_stamp, timeenc=self.timeenc, freq=self.freq)
 
+        # Set class attributes
         self.data_x = data[border1:border2]
         if self.inverse:
             self.data_y = df_data.values[border1:border2]
@@ -103,7 +118,18 @@ class Dataset_Custom(Dataset):
             self.data_y = data[border1:border2]
         self.data_stamp = data_stamp
 
-    def __getitem__(self, index):
+    def __getitem__(
+        self, index: int
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Get items for a given index.
+
+        Args:
+            index (int): Index to retrieve items.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: Sequence x, sequence y, sequence x mark, sequence y mark.
+        """
         s_begin = index
         s_end = s_begin + self.seq_len
         r_begin = s_end - self.label_len
@@ -125,8 +151,23 @@ class Dataset_Custom(Dataset):
 
         return seq_x, seq_y, seq_x_mark, seq_y_mark
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Get the length of the dataset.
+
+        Returns:
+            int: Length of the dataset.
+        """
         return len(self.data_x) - self.seq_len - self.pred_len + 1
 
-    def inverse_transform(self, data):
+    def inverse_transform(self, data: np.ndarray) -> np.ndarray:
+        """
+        Inverse transform the scaled data.
+
+        Args:
+            data (np.ndarray): Scaled data.
+
+        Returns:
+            np.ndarray: Inverse transformed data.
+        """
         return self.scaler.inverse_transform(data)
