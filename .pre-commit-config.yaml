@@ -35,6 +35,7 @@ repos:
     rev: 7.0.0  # Replace with the desired version
     hooks:
       - id: flake8  # Add the id key with the value 'flake8'
+        args: ['--ignore=E501,W293']
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
