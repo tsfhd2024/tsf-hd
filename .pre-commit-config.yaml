@@ -36,7 +36,7 @@ repos:
     hooks:
       - id: flake8 # Add the id key with the value 'flake8'
         # trunk-ignore(yamllint/quoted-strings)
-        args: ["--ignore=E501,W293"]
+        args: ["--ignore=E501,W293,E203"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
