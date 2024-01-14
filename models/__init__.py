@@ -1,1 +1,2 @@
-from models.multivariate import MultivariateModel
+from models.multivariate_ar import MultivariateARModel
+from models.multivariate_seq2seq import MultivariateSeq2SeqModel
