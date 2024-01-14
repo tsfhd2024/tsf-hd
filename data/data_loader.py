@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler as sklearn_StandardScaler
 from torch.utils.data import Dataset
+
 from utils.timefeatures import time_features
 from utils.tools import StandardScaler
 
@@ -20,7 +21,7 @@ class Dataset_ETT_hour(Dataset):
         features="S",
         data_path="ETTh1.csv",
         target="OT",
-        scale=True,
+        scale=False,
         inverse=False,
         timeenc=0,
         freq="h",
@@ -139,7 +140,7 @@ class Dataset_ETT_minute(Dataset):
         features="S",
         data_path="ETTm1.csv",
         target="OT",
-        scale=True,
+        scale=False,
         inverse=False,
         timeenc=0,
         freq="t",
@@ -256,7 +257,7 @@ class Dataset_Custom(Dataset):
         features="S",
         data_path="ETTh1.csv",
         target="OT",
-        scale=True,
+        scale=False,
         inverse=False,
         timeenc=0,
         freq="h",
@@ -375,7 +376,7 @@ class Dataset_Pred(Dataset):
         features="S",
         data_path="ETTh1.csv",
         target="OT",
-        scale=True,
+        scale=False,
         inverse=False,
         timeenc=0,
         freq="15min",
