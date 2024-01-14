@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-class MultivariateModel(nn.Module):
+
+class MultivariateARModel(nn.Module):
     """A PyTorch neural network model for multivariate data.
 
     Args:
@@ -23,9 +24,9 @@ class MultivariateModel(nn.Module):
     """
 
     def __init__(self, T: int, D: int, tau: int) -> None:
-        super(MultivariateModel, self).__init__()
-        self.fc1 = nn.Linear(T, D)
-        self.fc2 = nn.Linear(D, tau)
+        super(MultivariateARModel, self).__init__()
+        self.linear1 = nn.Linear(T, D)
+        self.linear2 = nn.Linear(D, 1)
         self.relu = nn.ReLU()
 
     def encode(self, x: Tensor) -> Tensor:
@@ -38,7 +39,7 @@ class MultivariateModel(nn.Module):
             Tensor: The encoded tensor.
 
         """
-        h = self.fc1(x)
+        h = self.linear1(x.T)
         return self.relu(h)
 
     def query(self, h: Tensor) -> Tensor:
@@ -51,7 +52,7 @@ class MultivariateModel(nn.Module):
             Tensor: The query result.
 
         """
-        return self.fc2(h)
+        return self.linear2(h)
 
     def forward(self, x_seq: Tensor) -> Tensor:
         """Performs forward propagation on the input sequence tensor.
