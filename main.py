@@ -73,7 +73,7 @@ def main():
         "--devices", type=str, default="0,1,2,3", help="device ids of multile gpus"
     )
     parser.add_argument(
-        "--method", type=str, default="seq2seqHD", help="choose seq2seqHD or ARHD"
+        "--method", type=str, default="seq2seq-HDC", help="choose seq2seq-HDC or AR-HDC"
     )
     parser.add_argument(
         "--learning_rate",
@@ -152,7 +152,7 @@ def main():
         args.target = data_info["T"]
 
         # Exp = Exp_TS2VecSupervised
-    Exps = {"seq2seqHD": ExpSeq2SeqHD, "ARHD": ExpARHD}
+    Exps = {"seq2seq-HDC": ExpSeq2SeqHD, "AR-HDC": ExpARHD}
     Exp = Exps[args.method]
     metrics, preds, true, corr, rse = [], [], [], [], []
 
