@@ -25,6 +25,8 @@ class MultivariateSeq2SeqModel(nn.Module):
 
     def __init__(self, T: int, D: int, tau: int) -> None:
         super(MultivariateSeq2SeqModel, self).__init__()
+        print("T : ", T)
+        print("D : ", D)
         self.fc1 = nn.Linear(T, D)
         self.fc2 = nn.Linear(D, tau)
         self.relu = nn.ReLU()
