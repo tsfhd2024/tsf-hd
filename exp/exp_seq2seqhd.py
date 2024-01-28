@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch import optim
+from tqdm import tqdm
 
 from data.data_loader import Dataset_Custom, Dataset_ETT_hour, Dataset_ETT_minute
 from exp.exp_basic import Exp_Basic
@@ -78,20 +79,24 @@ class ExpSeq2SeqHD(Exp_Basic):
 
     def train(self):
         tau, Ts = self.args.pred_len, self.args.seq_len
-        train_data: np.ndarray = self._get_data(flag="train")
-        for i in range(Ts, train_data.shape[1] - tau, 1):
+
+        train_data: np.ndarray = self._get_data(flag="train").data_x
+        self._select_optimizer()
+        for i in tqdm(range(Ts, train_data.shape[0] - tau, 1)):
             self._process_one_batch(train_data, i, mode="train")
 
     def test(self):
-        test_data = self._get_data(flag="test")
+        test_data: np.ndarray = self._get_data(flag="test").data_x
 
         preds = []
         trues = []
         rses, corrs = [], []
-        for i in range(
-            self.args.seq_len,
-            test_data.shape[1] - self.args.pred_len,
-            self.args.pred_len,
+        for i in tqdm(
+            range(
+                self.args.seq_len,
+                test_data.shape[0] - self.args.pred_len,
+                self.args.pred_len,
+            )
         ):
             pred, true = self._process_one_batch(test_data, i, mode="test")
             preds.append(pred.detach().cpu())
@@ -114,12 +119,13 @@ class ExpSeq2SeqHD(Exp_Basic):
     def _process_one_batch(
         self, data: np.ndarray, idx: int, mode: str
     ) -> Optional[Tuple[torch.Tensor, torch.Tensor]]:
-        x_seq = data[:, idx - self.args.seq_len : idx]
-        y = data[:, idx : idx + self.args.pred_len]
+        x_seq = torch.Tensor(data[idx - self.args.seq_len : idx, :]).to(self.device)
+        y = torch.Tensor(data[idx : idx + self.args.pred_len, :]).to(self.device)
         self.opt.zero_grad()
-        seq_tilda = self.model(x_seq)
-        loss = self._select_criterion(seq_tilda, y)
-        l2_reg = torch.tensor(0.0).cuda()
+        seq_tilda = self.model(x_seq.T).T
+
+        loss = self._select_criterion()(seq_tilda, y)
+        l2_reg = torch.tensor(0.0).to(self.device)
         for param in self.model.parameters():
             l2_reg += torch.norm(param) ** 2
         # Add L2 regularization to the loss
