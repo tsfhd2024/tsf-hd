@@ -91,7 +91,6 @@ def main():
     args = parser.parse_args()
 
     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
-    args.test_bsz = args.batch_size if args.test_bsz == -1 else args.test_bsz
     if args.use_gpu and args.use_multi_gpu:
         args.devices = args.devices.replace(" ", "")
         device_ids = args.devices.split(",")
