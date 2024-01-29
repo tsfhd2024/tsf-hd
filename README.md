@@ -59,5 +59,7 @@ You can specify one of the above method via the ```--method``` argument.
 
 **Other arguments:** Other useful arguments for experiments are:
 - ```--hvs_len```: Dimension of the hyperspace: e.g. **D = 1000** ,
-- ```--seq_len```: look-back windows' length, set to **2 * pred_len** by default,
-- ```--pred_len```: forecast windows' length
+- ```--seq_len```: look-back windows' length, set to **2 * &tau;** by default,
+- ```--pred_len```: forecast windows' **&tau** length
+
+ ### 3.  Results
