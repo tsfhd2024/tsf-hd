@@ -62,4 +62,6 @@ You can specify one of the above method via the ```--method``` argument.
 - ```--seq_len```: look-back windows' length, set to **2 * &tau;** by default,
 - ```--pred_len```: forecast windows' **&tau** length
 
- ### 3.  Results
+ ### 4.  Results
+![TSF-HD](https://github.com/tsfhd2024/tsf-hd/blob/main/data/image/short_term.png)
+![TSF-HD](https://github.com/tsfhd2024/tsf-hd/blob/main/data/image/long_term.png)
