@@ -65,3 +65,16 @@ You can specify one of the above method via the ```--method``` argument.
  ### 4.  Results
 ![TSF-HD](https://github.com/tsfhd2024/tsf-hd/blob/main/data/image/short_term.png)
 ![TSF-HD](https://github.com/tsfhd2024/tsf-hd/blob/main/data/image/long_term.png)
+
+## <span id="citelink">Citation</span>
+If you find this repository useful in your research, please consider citing the following papers:
+```
+@misc{mejri2024novel,
+      title={A Novel Hyperdimensional Computing Framework for Online Time Series Forecasting on the Edge}, 
+      author={Mohamed Mejri and Chandramouli Amarnath and Abhijit Chatterjee},
+      year={2024},
+      eprint={2402.01999},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+```
