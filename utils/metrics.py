@@ -7,16 +7,22 @@ def cumavg(m):
 
 
 def RSE(pred, true):
-    return np.sqrt(np.sum((true - pred) ** 2)) / np.sqrt(
-        np.sum((true - true.mean()) ** 2)
-    )
+    if np.var(true)>0:
+        return np.sqrt(np.sum((true - pred) ** 2)) / np.sqrt(
+            np.sum((true - true.mean()) ** 2)
+        )
+    else:
+        return np.sqrt(np.sum((true - pred) ** 2))
 
 
 def CORR(pred, true):
     mean_x = np.mean(pred)
     mean_y = np.mean(true)
     numerator = np.sum((pred - mean_x) * (true - mean_y))
-    denominator = np.sqrt(np.sum((pred - mean_x) ** 2) * np.sum((true - mean_y) ** 2))
+    if np.var(true) >0:
+        denominator = np.sqrt(np.sum((pred - mean_x) ** 2) * np.sum((true - mean_y) ** 2))
+    else:
+        denominator = np.sqrt(np.sum((pred - mean_x) ** 2))
     r = numerator / denominator
     return r
 
