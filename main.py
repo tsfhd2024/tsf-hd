@@ -63,11 +63,13 @@ def main():
         help="certain cols from the data files as the input features",
     )
 
+    
     # Informer decoder input: concat[start token series(label_len), zero padding series(pred_len)]
 
     parser.add_argument("--test_bsz", type=int, default=-1)
     parser.add_argument("--itr", type=int, default=1)
     parser.add_argument("--use_gpu", type=bool, default=True, help="use gpu")
+    parser.add_argument("--use_multi_gpu", type=bool, default=True, help="use use_multi_gpu")
     parser.add_argument("--gpu", type=int, default=0, help="gpu")
     parser.add_argument(
         "--devices", type=str, default="0,1,2,3", help="device ids of multile gpus"
