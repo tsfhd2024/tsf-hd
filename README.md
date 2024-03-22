@@ -67,8 +67,7 @@ You can specify one of the above method via the ```--method``` argument.
 ## <span id="citelink">Citation</span>
 If you find this repository useful in your research, please consider citing the following papers:
 ```
-@misc{mejri2024novel,
-      title={A Novel Hyperdimensional Computing Framework for Online Time Series Forecasting on the Edge}, 
+@misc{title={A Novel Hyperdimensional Computing Framework for Online Time Series Forecasting on the Edge}, 
       year={2024},
       eprint={2402.01999},
       archivePrefix={arXiv},
